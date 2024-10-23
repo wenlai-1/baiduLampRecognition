@@ -231,7 +231,7 @@ def lampImageAcquire():
     sleep(3)
     adb_tap(376, 543)
 
-    sleep(3)
+    # sleep(3)
 
     # 开始导航
     driver.find_element(AppiumBy.ID, 'com.baidu.BaiduMap:id/to_pro_nav').click()
