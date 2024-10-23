@@ -6,9 +6,9 @@ from cnocr import CnOcr
 from time import sleep
 
 import numpy as np
-from appium import webdriver
-from appium.options.android import UiAutomator2Options
-from appium.webdriver.common.appiumby import AppiumBy
+#from appium import webdriver
+#from appium.options.android import UiAutomator2Options
+#from appium.webdriver.common.appiumby import AppiumBy
 import cv2
 
 from baiduditu import image
@@ -57,7 +57,7 @@ def crop_lamp_area(image):
     # 找到最大轮廓（即最大的黑色区域）
     largest_contour = max(contours, key=cv2.contourArea)
 
-    # 检查最大轮廓的面积是否大于10000
+    # 检查最大轮廓的面积是否大于5000
     #print(f"最大轮廓的面积是: {cv2.contourArea(largest_contour)}")
     if cv2.contourArea(largest_contour) <= 10000:
         print("未检测到红绿灯")
@@ -317,7 +317,5 @@ def initEnvironment():
 if __name__ == '__main__':
 
 
-    lampImageAcquire()
-
-    # image = cv2.imread("image.jpg")
-    # lampColor, lampCountdown = baiduLampRecognition(image)
+    image = cv2.imread("C:/Users/ROG/Desktop/Code/honglvdeng/1.jpg")
+    lampColor, lampCountdown = baiduLampRecognition(image)
