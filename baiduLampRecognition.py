@@ -11,7 +11,7 @@ import numpy as np
 #from appium.webdriver.common.appiumby import AppiumBy
 import cv2
 
-from baiduditu import image
+# from baiduditu import image
 
 
 def adb_tap(x, y):
@@ -59,7 +59,7 @@ def crop_lamp_area(image):
 
     # 检查最大轮廓的面积是否大于5000
     #print(f"最大轮廓的面积是: {cv2.contourArea(largest_contour)}")
-    if cv2.contourArea(largest_contour) <= 10000:
+    if cv2.contourArea(largest_contour) <= 5000:
         print("未检测到红绿灯")
         return None
 
@@ -126,15 +126,22 @@ def detect_lamp_colors(image):
 
 def detect_lamp_countdown(black_region):
 
+    ##图像预处理
+    # 去掉black_region的左边57的部分和右边15的部分
+    left_x = 57
+    right_x = 15
+    cropped_black_region = black_region[:, left_x:-right_x]
+    # 将裁剪后的图像转换为灰度图像
+    gray_image = cv2.cvtColor(cropped_black_region, cv2.COLOR_BGR2GRAY)
+    # 应用高斯模糊(目前最优的参数)
+    blurred_image = cv2.GaussianBlur(gray_image, (7, 7), 0)
+    # 创建一个形态学核
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+    # 应用膨胀
+    dilated_image = cv2.dilate(blurred_image, kernel, iterations=1)
 
-    # 去掉black_region的左边125的部分
-    left_x = 125
-    # 这个是右边的数字部分
-    cropped_black_region = black_region[:, left_x:]
-
-
-    ocr = CnOcr(det_model_name='naive_det')
-    out = ocr.ocr(cropped_black_region)
+    ocr = CnOcr(det_model_name='naive_det') 
+    out = ocr.ocr(dilated_image)
 
     # 假设 out 是一个列表，且每个子元素包含一个字符串
     try:
@@ -144,9 +151,8 @@ def detect_lamp_countdown(black_region):
         print("OCR 结果的结构与预期不符")
         out_str = ""
 
-    # 替换 OCR 结果中的 "日" 为 "8"
-    out_str = out_str.replace("日", "8")
-
+    # 替换 OCR 结果：
+    out_str = out_str.replace("日", "8").replace("（门（（", "10").replace("马", "9").replace("{", "1").replace("B", "8").replace("|", "1").replace("S", "5").replace("I", "1").replace("D", "0")
     # 打印替换后的字符串
     print(out_str)
     return out_str
@@ -311,11 +317,8 @@ def initEnvironment():
 
 
 
-
-
-
 if __name__ == '__main__':
 
 
-    image = cv2.imread("C:/Users/ROG/Desktop/Code/honglvdeng/1.jpg")
-    lampColor, lampCountdown = baiduLampRecognition(image)
+    image1 = cv2.imread("C:/Users/ROG/Desktop/baiduditu/45.png")
+    lampColor, lampCountdown = baiduLampRecognition(image1)
